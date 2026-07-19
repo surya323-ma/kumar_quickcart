@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: kumar-quickcart
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: DB_PATH
+        value: /var/data/quickcart.db
+    disk:
+      name: quickcart-data
+      mountPath: /var/data
+      sizeGB: 1
