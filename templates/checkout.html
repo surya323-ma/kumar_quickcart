@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Checkout — Kumar QuickCart{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="section-head"><h2>Checkout</h2><p>{{ items|length }} item(s) • ₹{{ '%.2f'|format(grand_total) }}</p></div>
+
+  <form method="post" class="cart-layout">
+    <div>
+      <div class="card-panel">
+        <h3>📍 Delivery Address</h3>
+        <div class="field">
+          <textarea name="delivery_address" rows="3" required>{{ user['address'] or '' }}</textarea>
+        </div>
+      </div>
+
+      <div class="card-panel">
+        <h3>💳 Choose Payment Method</h3>
+        <div class="pay-options">
+          <label class="pay-option active">
+            <input type="radio" name="payment_method" value="UPI" checked>
+            <span class="icon">📱</span> UPI (GPay / PhonePe / Paytm)
+          </label>
+          <label class="pay-option">
+            <input type="radio" name="payment_method" value="CARD">
+            <span class="icon">💳</span> Credit / Debit Card
+          </label>
+          <label class="pay-option">
+            <input type="radio" name="payment_method" value="NETBANKING">
+            <span class="icon">🏦</span> Net Banking
+          </label>
+          <label class="pay-option">
+            <input type="radio" name="payment_method" value="WALLET">
+            <span class="icon">👛</span> QuickCart Wallet (₹{{ '%.2f'|format(user['wallet_balance']) }})
+          </label>
+          <label class="pay-option">
+            <input type="radio" name="payment_method" value="COD">
+            <span class="icon">💵</span> Cash on Delivery
+          </label>
+        </div>
+
+        <div class="pay-detail-box show" id="detail-UPI">
+          Enter any UPI ID (e.g. <em>name@upi</em>) at the next step of a real gateway. For this demo, payment is simulated instantly and a transaction ID is generated.
+        </div>
+        <div class="pay-detail-box" id="detail-CARD">
+          Card payments are simulated — no real card details are collected or stored in this demo project.
+        </div>
+        <div class="pay-detail-box" id="detail-NETBANKING">
+          You would normally be redirected to your bank's secure login. This demo auto-confirms the transaction.
+        </div>
+        <div class="pay-detail-box" id="detail-WALLET">
+          Current wallet balance: ₹{{ '%.2f'|format(user['wallet_balance']) }}. Amount will be deducted instantly.
+        </div>
+        <div class="pay-detail-box" id="detail-COD">
+          Pay in cash to the delivery partner when your order arrives. Payment status will show as pending until delivery.
+        </div>
+      </div>
+
+      <div class="card-panel">
+        <h3>🧾 Items in this order</h3>
+        <table class="receipt-table">
+          <thead><tr><th>Item</th><th>Weight</th><th>Mfg</th><th>Expiry</th><th>Qty</th><th>Price</th></tr></thead>
+          <tbody>
+          {% for it in items %}
+            <tr><td>{{ it['emoji'] }} {{ it['name'] }}</td><td>{{ it['weight'] }}</td><td>{{ it['mfg_date'] }}</td><td>{{ it['expiry_date'] }}</td><td>{{ it['qty'] }}</td><td>₹{{ '%.2f'|format(it['line_total']) }}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <h3>Payable Amount</h3>
+      <div class="summary-row"><span>Subtotal</span><span>₹{{ '%.2f'|format(subtotal) }}</span></div>
+      <div class="summary-row"><span>Delivery Fee</span><span>{{ '₹%.2f'|format(delivery_fee) if delivery_fee > 0 else 'FREE' }}</span></div>
+      <div class="summary-row total"><span>Grand Total</span><span>₹{{ '%.2f'|format(grand_total) }}</span></div>
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:14px;">Place Order &amp; Pay →</button>
+      <p style="font-size:11.5px; color:var(--ink-400); margin-top:10px;">By placing this order you agree to our Terms &amp; Refund Policy.</p>
+    </div>
+  </form>
+</div>
+{% endblock %}

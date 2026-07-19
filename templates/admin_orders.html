@@ -1,0 +1,35 @@
+{% extends "admin_base.html" %}
+{% set active = 'orders' %}
+{% block title %}Manage Orders — Kumar QuickCart{% endblock %}
+{% block admin_content %}
+<div class="section-head"><h2>All Orders</h2><p>{{ orders|length }} order(s)</p></div>
+
+<div class="card-panel">
+  <table class="data-table">
+    <thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Amount</th><th>Payment</th><th>Status</th><th>Update</th></tr></thead>
+    <tbody>
+      {% for o in orders %}
+      <tr>
+        <td>{{ o['order_number'] }}</td>
+        <td>{{ o['customer_name'] }}</td>
+        <td>{{ o['phone'] }}</td>
+        <td>₹{{ '%.2f'|format(o['grand_total']) }}</td>
+        <td>{{ o['payment_method'] }} <span class="pill {{ 'green' if o['payment_status']=='PAID' else 'orange' }}">{{ o['payment_status'] }}</span></td>
+        <td><span class="pill blue">{{ o['order_status'] }}</span></td>
+        <td>
+          <form method="post" action="{{ url_for('admin_update_order_status') }}" style="display:flex; gap:4px;">
+            <input type="hidden" name="order_id" value="{{ o['id'] }}">
+            <select name="status">
+              {% for s in ['Placed','Packed','Out for Delivery','Delivered','Cancelled'] %}
+              <option value="{{ s }}" {{ 'selected' if o['order_status']==s else '' }}>{{ s }}</option>
+              {% endfor %}
+            </select>
+            <button class="btn btn-outline btn-sm" type="submit">Update</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

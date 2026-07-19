@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}File a Complaint — Kumar QuickCart{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="section-head"><h2>📣 Complaint Forum</h2><p>Report issues with your FPS dealer or order</p></div>
+
+  <div class="cart-layout">
+    <div class="card-panel">
+      <h3>Submit a New Complaint</h3>
+      <form method="post">
+        <div class="field">
+          <label>Related Order (optional)</label>
+          <select name="order_id">
+            <option value="">General complaint (not order-specific)</option>
+            {% for o in orders %}
+            <option value="{{ o['id'] }}">{{ o['order_number'] }} — ₹{{ '%.2f'|format(o['grand_total']) }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field"><label>Subject</label><input type="text" name="subject" required placeholder="e.g. Short quantity delivered"></div>
+        <div class="field"><label>Details</label><textarea name="message" rows="4" required placeholder="Describe the issue in detail..."></textarea></div>
+        <button class="btn btn-primary btn-block" type="submit">Submit Complaint</button>
+      </form>
+    </div>
+    <div class="summary-card">
+      <h3>Common Issues</h3>
+      <ul style="font-size:13px; color:var(--ink-600); line-height:1.9;">
+        <li>🌾 Short quantity / bogus stock</li>
+        <li>🕐 FPS shop closed during hours</li>
+        <li>💰 Overcharging above PDS rate</li>
+        <li>🚚 Delayed home delivery</li>
+        <li>📦 Damaged / expired product received</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

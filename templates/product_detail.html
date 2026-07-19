@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ p['name'] }} — Kumar QuickCart{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="card-panel" style="display:grid; grid-template-columns: 280px 1fr; gap:30px;">
+    <div>
+      <div class="emoji" style="font-size:80px; height:220px; display:flex; align-items:center; justify-content:center;">{{ p['image_emoji'] }}</div>
+    </div>
+    <div>
+      {% if p['is_ration_item'] %}<span class="pill green">PDS SUBSIDISED RATE</span>{% endif %}
+      <h2 style="margin-top:10px;">{{ p['name'] }}</h2>
+      <p style="color:var(--ink-400); font-size:13.5px;">{{ p['description'] }}</p>
+
+      <div class="price-row" style="margin:16px 0;">
+        <span class="price" style="font-size:26px;">₹{{ '%.2f'|format(p['price']) }}</span>
+        {% if p['mrp'] > p['price'] %}<span class="mrp">₹{{ '%.2f'|format(p['mrp']) }}</span>
+        <span class="save">{{ ((1 - p['price']/p['mrp'])*100)|round(0,'floor')|int }}% OFF</span>{% endif %}
+      </div>
+
+      <div class="receipt-info-grid" style="max-width:460px;">
+        <div><div class="lbl">Item Name</div>{{ p['name'] }}</div>
+        <div><div class="lbl">Net Weight</div>{{ p['weight'] }}</div>
+        <div><div class="lbl">Mfg. Date</div>{{ p['mfg_date'] }}</div>
+        <div><div class="lbl">Expiry Date</div>{{ p['expiry_date'] }}</div>
+        <div><div class="lbl">Rating</div>⭐ {{ p['rating'] }} / 5</div>
+        <div><div class="lbl">Stock</div>{{ p['stock'] }} units available</div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:16px; margin-top:20px;">
+        <div class="qty-stepper" id="stepper">
+          <button type="button" onclick="stepQty(-1)">−</button>
+          <span id="qtyVal">1</span>
+          <button type="button" onclick="stepQty(1)">+</button>
+        </div>
+        <button class="btn btn-primary" onclick="addToCart({{ p['id'] }}, parseInt(document.getElementById('qtyVal').textContent), this)">Add to Cart</button>
+        <a href="{{ url_for('view_cart') }}" class="btn btn-outline">Go to Cart →</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  let qty = 1;
+  function stepQty(delta) {
+    qty = Math.max(1, qty + delta);
+    document.getElementById('qtyVal').textContent = qty;
+  }
+</script>
+{% endblock %}

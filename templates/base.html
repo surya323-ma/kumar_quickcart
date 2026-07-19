@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Kumar QuickCart — Ration & Grocery, Delivered{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container">
+    <span><span class="tag">e-Ration + Grocery</span> &nbsp;|&nbsp; Govt. authorised Fair Price Shop partner</span>
+    <span>📍 Deliver to: Kanpur, Uttar Pradesh - 208001</span>
+  </div>
+</div>
+
+<header class="header">
+  <div class="container">
+    <a href="{{ url_for('home') }}" class="brand">
+      <span class="mark">🛒</span>
+      <span>Kumar QuickCart<small>Smarter Ration &amp; Grocery Shopping</small></span>
+    </a>
+
+    <form class="searchbar" action="{{ url_for('home') }}" method="get">
+      <input type="text" name="q" placeholder="Search for atta, rice, milk, soap..." value="{{ query|default('') }}">
+      <button type="submit">Search</button>
+    </form>
+
+    <div class="header-actions">
+      {% if user %}
+        {% if user['role'] == 'admin' %}
+        <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🛠️</span>Admin</a>
+        {% else %}
+        <a href="{{ url_for('my_orders') }}"><span class="icon">📦</span>Orders</a>
+        <a href="{{ url_for('complaint') }}"><span class="icon">📣</span>Help</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}"><span class="icon">🚪</span>Logout</a>
+      {% else %}
+        <a href="{{ url_for('login') }}"><span class="icon">👤</span>Login</a>
+      {% endif %}
+      <a href="{{ url_for('view_cart') }}" class="cart-link"><span class="icon">🛍️</span>Cart
+        {% if cart_count %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
+      </a>
+    </div>
+  </div>
+</header>
+
+<nav class="catnav">
+  <div class="container">
+    <ul>
+      <li><a href="{{ url_for('home') }}" class="{{ 'active' if not active_cat else '' }}">🏠 All</a></li>
+      {% if categories %}
+        {% for c in categories %}
+        <li><a href="{{ url_for('home', cat=c['id']) }}" class="{{ 'active' if active_cat and active_cat|int == c['id'] else '' }}">{{ c['icon'] }} {{ c['name'] }}</a></li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+
+<div class="flash-wrap">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
+
+{% block content %}{% endblock %}
+
+<footer class="footer">
+  <div class="container">
+    <div>
+      <h4>Kumar QuickCart</h4>
+      <ul>
+        <li>About the e-Ration Shop</li>
+        <li>How it works</li>
+        <li>Fair Price Shop partners</li>
+        <li>Careers</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Customer Help</h4>
+      <ul>
+        <li><a href="{{ url_for('complaint') }}">File a complaint</a></li>
+        <li><a href="{{ url_for('my_orders') }}">Track your order</a></li>
+        <li>Returns &amp; refunds</li>
+        <li>Contact FPS dealer</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Payments</h4>
+      <ul>
+        <li>UPI (GPay, PhonePe, Paytm)</li>
+        <li>Credit / Debit Card</li>
+        <li>Net Banking</li>
+        <li>QuickCart Wallet</li>
+        <li>Cash on Delivery</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Government Scheme</h4>
+      <ul>
+        <li>Public Distribution System (PDS)</li>
+        <li>Aadhaar-enabled verification</li>
+        <li>Ministry of Consumer Affairs</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 Kumar QuickCart — A Digital Initiative for Transparent Ration Distribution</div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

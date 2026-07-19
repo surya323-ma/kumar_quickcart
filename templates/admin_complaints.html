@@ -1,0 +1,33 @@
+{% extends "admin_base.html" %}
+{% set active = 'complaints' %}
+{% block title %}Complaints — Kumar QuickCart{% endblock %}
+{% block admin_content %}
+<div class="section-head"><h2>Customer Complaints</h2><p>{{ complaints|length }} total</p></div>
+
+<div class="card-panel">
+  <table class="data-table">
+    <thead><tr><th>Customer</th><th>Subject</th><th>Message</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for c in complaints %}
+      <tr>
+        <td>{{ c['customer_name'] }}</td>
+        <td>{{ c['subject'] }}</td>
+        <td style="max-width:280px;">{{ c['message'] }}</td>
+        <td><span class="pill {{ 'green' if c['status']=='Resolved' else 'red' }}">{{ c['status'] }}</span></td>
+        <td>{{ c['created_at'] }}</td>
+        <td>
+          {% if c['status'] != 'Resolved' %}
+          <form method="post" action="{{ url_for('admin_resolve_complaint') }}">
+            <input type="hidden" name="complaint_id" value="{{ c['id'] }}">
+            <button class="btn btn-primary btn-sm" type="submit">Mark Resolved</button>
+          </form>
+          {% else %}✅{% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" style="text-align:center; color:var(--ink-400);">No complaints filed yet</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

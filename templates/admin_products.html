@@ -1,0 +1,65 @@
+{% extends "admin_base.html" %}
+{% set active = 'products' %}
+{% block title %}Manage Products — Kumar QuickCart{% endblock %}
+{% block admin_content %}
+<div class="section-head"><h2>Products &amp; Stock</h2><p>{{ products|length }} product(s) listed</p></div>
+
+<div class="card-panel">
+  <h3>➕ Add New Product</h3>
+  <form method="post">
+    <input type="hidden" name="action" value="add">
+    <div class="form-inline">
+      <div class="field"><label>Item Name</label><input type="text" name="name" required></div>
+      <div class="field"><label>Category</label>
+        <select name="category_id" required>
+          {% for c in categories %}<option value="{{ c['id'] }}">{{ c['name'] }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field"><label>Price (₹)</label><input type="number" step="0.01" name="price" required></div>
+      <div class="field"><label>MRP (₹)</label><input type="number" step="0.01" name="mrp" required></div>
+      <div class="field"><label>Weight</label><input type="text" name="weight" placeholder="1 kg" required></div>
+      <div class="field"><label>Mfg. Date</label><input type="text" name="mfg_date" placeholder="DD-MM-YYYY" required></div>
+      <div class="field"><label>Expiry Date</label><input type="text" name="expiry_date" placeholder="DD-MM-YYYY" required></div>
+      <div class="field"><label>Stock Qty</label><input type="number" name="stock" required></div>
+      <div class="field"><label>Emoji Icon</label><input type="text" name="emoji" placeholder="📦"></div>
+      <div class="field"><label>Ration Item?</label><select name="is_ration_item"><option value="">No</option><option value="1">Yes (PDS Subsidised)</option></select></div>
+    </div>
+    <div class="field" style="margin-top:10px;"><label>Description</label><input type="text" name="description" placeholder="Short description"></div>
+    <button class="btn btn-primary" type="submit" style="margin-top:6px;">Add Product</button>
+  </form>
+</div>
+
+<div class="card-panel">
+  <h3>All Products</h3>
+  <table class="data-table">
+    <thead><tr><th>Item</th><th>Category</th><th>Price</th><th>Weight</th><th>Expiry</th><th>Stock</th><th>Ration</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td>{{ p['image_emoji'] }} {{ p['name'] }}</td>
+        <td>{{ p['cat_name'] }}</td>
+        <td>₹{{ '%.2f'|format(p['price']) }}</td>
+        <td>{{ p['weight'] }}</td>
+        <td>{{ p['expiry_date'] }}</td>
+        <td>
+          <form method="post" style="display:flex; gap:4px;">
+            <input type="hidden" name="action" value="update_stock">
+            <input type="hidden" name="product_id" value="{{ p['id'] }}">
+            <input type="number" name="stock" value="{{ p['stock'] }}" style="width:60px; padding:4px; border:1px solid var(--line); border-radius:6px;">
+            <button class="btn btn-outline btn-sm" type="submit">Save</button>
+          </form>
+        </td>
+        <td>{% if p['is_ration_item'] %}<span class="pill green">PDS</span>{% else %}—{% endif %}</td>
+        <td>
+          <form method="post" onsubmit="return confirm('Delete this product?');">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="product_id" value="{{ p['id'] }}">
+            <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

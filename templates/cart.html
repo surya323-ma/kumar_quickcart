@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Your Cart — Kumar QuickCart{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="section-head"><h2>Your Cart</h2><p>{{ items|length }} item(s)</p></div>
+
+  {% if not items %}
+  <div class="empty-state">
+    <div class="big">🛒</div>
+    <h3>Your cart is empty</h3>
+    <p>Add some ration staples or groceries to get started.</p>
+    <a href="{{ url_for('home') }}" class="btn btn-primary" style="margin-top:14px;">Browse Products</a>
+  </div>
+  {% else %}
+  <div class="cart-layout">
+    <div>
+      {% for it in items %}
+      <div class="cart-row" data-pid="{{ it['id'] }}">
+        <div class="emoji">{{ it['emoji'] }}</div>
+        <div>
+          <div class="name">{{ it['name'] }}</div>
+          <div class="sub">{{ it['weight'] }} • Mfg: {{ it['mfg_date'] }} • Exp: {{ it['expiry_date'] }}</div>
+          <div class="sub">₹{{ '%.2f'|format(it['price']) }} / unit</div>
+        </div>
+        <div class="qty-stepper">
+          <button type="button" onclick="setCartQty({{ it['id'] }}, {{ it['qty'] }} - 1)">−</button>
+          <input class="qty-input-{{ it['id'] }}" value="{{ it['qty'] }}" readonly>
+          <button type="button" onclick="setCartQty({{ it['id'] }}, {{ it['qty'] }} + 1)">+</button>
+        </div>
+        <div style="font-weight:700;">₹{{ '%.2f'|format(it['line_total']) }}</div>
+        <button class="btn btn-danger btn-sm" onclick="setCartQty({{ it['id'] }}, 0)">Remove</button>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="summary-card">
+      <h3>Order Summary</h3>
+      <div class="summary-row"><span>Subtotal</span><span id="cart-subtotal">₹{{ '%.2f'|format(subtotal) }}</span></div>
+      <div class="summary-row"><span>Delivery Fee</span><span id="cart-delivery">{{ '₹%.2f'|format(delivery_fee) if delivery_fee > 0 else 'FREE' }}</span></div>
+      <div class="summary-row total"><span>Grand Total</span><span id="cart-grandtotal">₹{{ '%.2f'|format(grand_total) }}</span></div>
+      <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-block" style="margin-top:14px;">Proceed to Checkout →</a>
+      <p style="font-size:11.5px; color:var(--ink-400); margin-top:10px;">Free delivery on orders above ₹199</p>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

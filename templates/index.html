@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="hero-eyebrow">🇮🇳 Digitising the Public Distribution System</span>
+      <h1>Your ration shop, now on your phone.</h1>
+      <p>Order your monthly quota of atta, rice, dal &amp; oil along with everyday groceries — from your verified Fair Price Shop, delivered home. No queues, no bogus cards, full transparency.</p>
+      <div style="display:flex; gap:12px;">
+        <a href="#products" class="btn btn-primary">Start Shopping</a>
+        {% if not user %}<a href="{{ url_for('register') }}" class="btn btn-outline" style="background:transparent;border-color:rgba(255,255,255,.6);color:white;">Create Free Account</a>{% endif %}
+      </div>
+      <div class="hero-stats">
+        <div><strong>12,400+</strong><span>Ration Cards Linked</span></div>
+        <div><strong>380+</strong><span>FPS Partner Shops</span></div>
+        <div><strong>₹0</strong><span>Delivery over ₹199</span></div>
+      </div>
+    </div>
+    <div class="hero-card">
+      <h3>🚚 Why Kumar QuickCart?</h3>
+      <ul>
+        <li><span>Aadhaar-verified beneficiaries</span><span>✅</span></li>
+        <li><span>Real-time stock at your FPS</span><span>✅</span></li>
+        <li><span>UPI / Card / Wallet / COD</span><span>✅</span></li>
+        <li><span>Digital receipt for every order</span><span>✅</span></li>
+        <li><span>In-app complaint redressal</span><span>✅</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="container section" id="products">
+  <div class="ration-strip">
+    <span class="badge">GOVT. SUBSIDISED</span>
+    <p>Your monthly ration entitlement (atta, rice, dal, oil, sugar, salt) is available below at official PDS rates — up to <strong>35 kg per card</strong>.</p>
+  </div>
+
+  <div class="section-head">
+    <h2>{% if query %}Results for "{{ query }}"{% else %}Ration Staples{% endif %}</h2>
+    <p>{{ ration_items|length }} item(s) on subsidy</p>
+  </div>
+  <div class="grid">
+    {% for p in (products if query or active_cat else ration_items) %}
+    <div class="pcard">
+      {% if p['is_ration_item'] %}<span class="ration-tag">PDS RATE</span>{% endif %}
+      <div class="emoji">{{ p['image_emoji'] }}</div>
+      <a href="{{ url_for('product_detail', pid=p['id']) }}"><h4>{{ p['name'] }}</h4></a>
+      <div class="meta">{{ p['weight'] }} • ⭐ {{ p['rating'] }} • Exp: {{ p['expiry_date'] }}</div>
+      <div class="price-row">
+        <span class="price">₹{{ '%.2f'|format(p['price']) }}</span>
+        {% if p['mrp'] > p['price'] %}<span class="mrp">₹{{ '%.2f'|format(p['mrp']) }}</span>
+        <span class="save">{{ ((1 - p['price']/p['mrp'])*100)|round(0,'floor')|int }}% OFF</span>{% endif %}
+      </div>
+      <div class="stock-line {{ 'low' if p['stock'] < 30 else '' }}">{{ 'Only ' ~ p['stock'] ~ ' left!' if p['stock'] < 30 else p['stock'] ~ ' in stock' }}</div>
+      <button class="btn btn-primary btn-block" onclick="addToCart({{ p['id'] }}, 1, this)">Add to Cart</button>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if not query and not active_cat %}
+  <div class="section-head" style="margin-top:40px;">
+    <h2>Fresh Grocery &amp; Household Picks</h2>
+    <p>Curated for your home, at JioMart-style pricing</p>
+  </div>
+  <div class="grid">
+    {% for p in products %}
+      {% if not p['is_ration_item'] %}
+      <div class="pcard">
+        <div class="emoji">{{ p['image_emoji'] }}</div>
+        <a href="{{ url_for('product_detail', pid=p['id']) }}"><h4>{{ p['name'] }}</h4></a>
+        <div class="meta">{{ p['weight'] }} • ⭐ {{ p['rating'] }} • Exp: {{ p['expiry_date'] }}</div>
+        <div class="price-row">
+          <span class="price">₹{{ '%.2f'|format(p['price']) }}</span>
+          {% if p['mrp'] > p['price'] %}<span class="mrp">₹{{ '%.2f'|format(p['mrp']) }}</span>
+          <span class="save">{{ ((1 - p['price']/p['mrp'])*100)|round(0,'floor')|int }}% OFF</span>{% endif %}
+        </div>
+        <div class="stock-line {{ 'low' if p['stock'] < 30 else '' }}">{{ 'Only ' ~ p['stock'] ~ ' left!' if p['stock'] < 30 else p['stock'] ~ ' in stock' }}</div>
+        <button class="btn btn-primary btn-block" onclick="addToCart({{ p['id'] }}, 1, this)">Add to Cart</button>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

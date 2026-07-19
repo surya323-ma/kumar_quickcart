@@ -1,0 +1,61 @@
+{% extends "admin_base.html" %}
+{% set active = 'dashboard' %}
+{% block title %}Admin Dashboard — Kumar QuickCart{% endblock %}
+{% block admin_content %}
+<div class="section-head"><h2>Dashboard Overview</h2><p>Welcome, {{ admin['name'] }}</p></div>
+
+<div class="stat-grid">
+  <div class="stat-card"><div class="icon">🧾</div><div class="num">{{ total_orders }}</div><div class="lbl">Total Orders</div></div>
+  <div class="stat-card"><div class="icon">💰</div><div class="num">₹{{ total_revenue }}</div><div class="lbl">Revenue Collected</div></div>
+  <div class="stat-card"><div class="icon">📦</div><div class="num">{{ total_products }}</div><div class="lbl">Products Listed</div></div>
+  <div class="stat-card"><div class="icon">👥</div><div class="num">{{ total_users }}</div><div class="lbl">Registered Customers</div></div>
+  <div class="stat-card"><div class="icon">📣</div><div class="num">{{ open_complaints }}</div><div class="lbl">Open Complaints</div></div>
+</div>
+
+<div class="cart-layout">
+  <div class="card-panel">
+    <h3>Recent Orders</h3>
+    <table class="data-table">
+      <thead><tr><th>Order #</th><th>Customer</th><th>Amount</th><th>Payment</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for o in recent_orders %}
+        <tr>
+          <td>{{ o['order_number'] }}</td><td>{{ o['customer_name'] }}</td>
+          <td>₹{{ '%.2f'|format(o['grand_total']) }}</td>
+          <td><span class="pill {{ 'green' if o['payment_status']=='PAID' else 'orange' }}">{{ o['payment_method'] }}</span></td>
+          <td><span class="pill blue">{{ o['order_status'] }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-panel">
+    <h3>Products by Category</h3>
+    <div class="bar-chart">
+      {% set max_cnt = (by_category|map(attribute='cnt')|max) or 1 %}
+      {% for c in by_category %}
+      <div class="bar-col">
+        <div class="bar" style="height: {{ (c['cnt'] / max_cnt * 130)|round(0,'ceil')|int if max_cnt else 0 }}px;"></div>
+        <div class="bar-lbl">{{ c['name'] }}<br><strong>{{ c['cnt'] }}</strong></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="card-panel">
+  <h3>⚠️ Low Stock Alert (below 50 units)</h3>
+  <table class="data-table">
+    <thead><tr><th>Product</th><th>Weight</th><th>Stock</th><th>Expiry</th></tr></thead>
+    <tbody>
+      {% for p in low_stock %}
+      <tr><td>{{ p['image_emoji'] }} {{ p['name'] }}</td><td>{{ p['weight'] }}</td>
+        <td><span class="pill red">{{ p['stock'] }} left</span></td><td>{{ p['expiry_date'] }}</td></tr>
+      {% else %}
+      <tr><td colspan="4" style="text-align:center; color:var(--ink-400);">All products sufficiently stocked ✅</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

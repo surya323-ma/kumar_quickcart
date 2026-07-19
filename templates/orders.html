@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}My Orders — Kumar QuickCart{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="section-head"><h2>My Orders</h2><p>{{ orders|length }} order(s)</p></div>
+
+  {% if not orders %}
+  <div class="empty-state"><div class="big">📦</div><h3>No orders yet</h3>
+    <a href="{{ url_for('home') }}" class="btn btn-primary" style="margin-top:14px;">Start Shopping</a></div>
+  {% else %}
+  <table class="data-table">
+    <thead><tr><th>Order #</th><th>Date</th><th>Amount</th><th>Payment</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for o in orders %}
+      <tr>
+        <td>{{ o['order_number'] }}</td>
+        <td>{{ o['order_date'] }}</td>
+        <td>₹{{ '%.2f'|format(o['grand_total']) }}</td>
+        <td>{{ o['payment_method'] }} <span class="pill {{ 'green' if o['payment_status']=='PAID' else 'orange' }}">{{ o['payment_status'] }}</span></td>
+        <td><span class="pill blue">{{ o['order_status'] }}</span></td>
+        <td><a href="{{ url_for('receipt', order_id=o['id']) }}" class="btn btn-outline btn-sm">View Receipt</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endblock %}
